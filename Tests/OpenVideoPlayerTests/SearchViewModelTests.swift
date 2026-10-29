@@ -1,5 +1,5 @@
 import XCTest
-@testable import OpenVideoPlayerCore
+@testable import OpenVideoPlayer
 
 final class MockVideoDiscoveryService: VideoDiscoveryService, @unchecked Sendable {
     var searchResultToReturn: SearchResultPage?

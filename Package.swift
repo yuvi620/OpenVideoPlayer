@@ -8,13 +8,13 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "OpenVideoPlayerCore",
-            targets: ["OpenVideoPlayerCore"]
+            name: "OpenVideoPlayer",
+            targets: ["OpenVideoPlayer"]
         )
     ],
     targets: [
         .target(
-            name: "OpenVideoPlayerCore",
+            name: "OpenVideoPlayer",
             path: "OpenVideoPlayer",
             exclude: [
                 "App",
@@ -25,7 +25,7 @@ let package = Package(
         ),
         .testTarget(
             name: "OpenVideoPlayerTests",
-            dependencies: ["OpenVideoPlayerCore"],
+            dependencies: ["OpenVideoPlayer"],
             path: "Tests/OpenVideoPlayerTests"
         )
     ]

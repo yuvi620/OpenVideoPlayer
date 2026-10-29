@@ -1,6 +1,6 @@
 import XCTest
 import SwiftData
-@testable import OpenVideoPlayerCore
+@testable import OpenVideoPlayer
 
 final class SwiftDataPersistenceTests: XCTestCase {
 
