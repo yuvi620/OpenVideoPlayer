@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-ipa:
     name: Build & Package IPA
@@ -41,8 +44,22 @@ jobs:
           fi
           echo "Found compiled app bundle at: $APP_PATH"
           cp -r "$APP_PATH" build/Payload/
+          
+          # Verify Info.plist existence and validity
+          if [ ! -f "build/Payload/OpenVideoPlayer.app/Info.plist" ]; then
+            echo "::error::Info.plist missing from Payload/OpenVideoPlayer.app"
+            ls -la build/Payload/OpenVideoPlayer.app/
+            exit 1
+          fi
+          echo "=== Info.plist Content ==="
+          plutil -p build/Payload/OpenVideoPlayer.app/Info.plist
+
+          # Package IPA
           cd build && zip -qr OpenVideoPlayer.ipa Payload/
           ls -lh OpenVideoPlayer.ipa
+          
+          echo "=== IPA Archive Structure ==="
+          unzip -l OpenVideoPlayer.ipa | head -n 30
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
@@ -50,6 +67,18 @@ jobs:
           name: OpenVideoPlayer-Unsigned-IPA
           path: build/OpenVideoPlayer.ipa
           retention-days: 14
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.0.0-build${{ github.run_number }}
+          name: "OpenVideoPlayer v1.0.0 (Build ${{ github.run_number }})"
+          files: build/OpenVideoPlayer.ipa
+          make_latest: true
+          body: |
+            ### OpenVideoPlayer iOS Direct IPA
+            Download `OpenVideoPlayer.ipa` directly below to install with SideStore, AltStore, or Sideloadly.
 
   test:
     name: Run Unit Tests
