@@ -22,20 +22,27 @@ IPA_PATH="$OUTPUT_DIR/OpenVideoPlayer.ipa"
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-echo "==> 1. Building and Archiving (Release)..."
-xcodebuild archive \
+echo "==> 1. Building for iOS Device (Release)..."
+xcodebuild build \
   -project OpenVideoPlayer.xcodeproj \
   -scheme OpenVideoPlayer \
   -configuration Release \
-  -destination 'generic/platform=iOS' \
-  -archivePath "$ARCHIVE_PATH" \
+  -sdk iphoneos \
+  -derivedDataPath "$OUTPUT_DIR" \
   CODE_SIGNING_ALLOWED=NO \
   CODE_SIGNING_REQUIRED=NO \
-  CODE_SIGN_IDENTITY=""
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGN_STYLE=Manual \
+  AD_HOC_CODE_SIGNING_ALLOWED=YES
 
 echo "==> 2. Packaging Application Bundle into IPA Payload..."
 mkdir -p "$PAYLOAD_DIR"
-cp -r "$ARCHIVE_PATH/Products/Applications/OpenVideoPlayer.app" "$PAYLOAD_DIR/"
+APP_PATH=$(find "$OUTPUT_DIR/Build/Products" -name "OpenVideoPlayer.app" -type d | head -n 1)
+if [ -z "$APP_PATH" ]; then
+  echo "Error: OpenVideoPlayer.app not found in build products"
+  exit 1
+fi
+cp -r "$APP_PATH" "$PAYLOAD_DIR/"
 
 echo "==> 3. Creating IPA archive..."
 cd "$OUTPUT_DIR"
